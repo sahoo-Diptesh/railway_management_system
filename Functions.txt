@@ -1,0 +1,27 @@
+# 1. function to add a new passenger to the list
+CREATE OR REPLACE FUNCTION add_passenger1(p_first_name IN Passengers.first_name%TYPE, p_last_name IN Passengers.last_name%TYPE, p_email IN Passengers.email%TYPE, p_phone_number IN Passengers.phone_number%TYPE, p_address IN Passengers.address%TYPE) RETURN         
+Passengers.passenger_id%TYPE         
+IS  
+new_passenger_id Passengers.passenger_id%TYPE; 
+BEGIN INSERT INTO Passengers (first_name, last_name, email, phone_number, address) VALUES (p_first_name, p_last_name, p_email, p_phone_number, p_address) 
+RETURNING passenger_id INTO new_passenger_id; 
+RETURN new_passenger_id; 
+END; 
+
+
+#2. function to update number of seats for train
+CREATE OR REPLACE FUNCTION update_train_num_seats(train_id INT, new_num_seats INT) RETURN 
+BOOLEAN AS 
+BEGIN 
+UPDATE Trains SET num_seats = new_num_seats WHERE train_id = train_id; 
+RETURN TRUE; 
+END; 
+
+
+#3. function to get the bookings made by passenger
+CREATE OR REPLACE FUNCTION get_bookings_by_passenger(passenger_id INT) 
+RETURN SYS_REFCURSOR AS booking_cur SYS_REFCURSOR; 
+BEGIN 
+OPEN booking_cur 
+FOR SELECT b.booking_id, t.train_name, r.route_name, b.booking_date, b.travel_date, b.class_type, b.seat_number FROM Bookings b JOIN Trains t ON b.train_id = t.train_id JOIN Routes r ON b.route_id = r.route_id WHERE b.passenger_id = passenger_id; RETURN booking_cur; 
+END; 

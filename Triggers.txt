@@ -1,0 +1,26 @@
+#1. Update train capacity
+CREATE OR REPLACE TRIGGER update_train_capacity AFTER INSERT ON Bookings FOR EACH ROW 
+BEGIN 
+UPDATE Trains SET current_capacity = current_capacity + 1 WHERE train_id = :NEW.train_id; 
+END;
+
+
+#2. Check seat availability
+CREATE OR REPLACE TRIGGER check_seat_availability BEFORE INSERT ON Bookings FOR EACH ROW DECLARE num_seats_booked INT; 
+BEGIN 
+SELECT COUNT(*) INTO num_seats_booked FROM Bookings WHERE train_id = :NEW.train_id AND travel_date = :NEW.travel_date AND seat_number = :NEW.seat_number; 
+IF num_seats_booked > 0 THEN RAISE_APPLICATION_ERROR(-20001, 'Seat is already booked.'); 
+END IF;
+END; 
+
+
+#3. Check train capacity
+CREATE OR REPLACE TRIGGER check_train_capacity BEFORE INSERT ON 
+Bookings FOR EACH ROW 
+DECLARE
+max_capacity INT; 
+current_capacity INT; 
+BEGIN SELECT max_capacity, current_capacity INTO max_capacity, current_capacity FROM Trains WHERE train_id = :NEW.train_id; 
+IF current_capacity >= max_capacity THEN RAISE_APPLICATION_ERROR(-20002, 'Train is already at maximum capacity.');
+END IF; 
+END; 

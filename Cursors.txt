@@ -1,0 +1,41 @@
+#1. Get passenger Bookings
+CREATE OR REPLACE PROCEDURE get_passengers_bookings IS CURSOR 
+passengers_cursor IS 
+SELECT * FROM Passengers;
+passenger Passengers%ROWTYPE; 
+CURSOR bookings_cursor (p_id IN NUMBER) IS 
+SELECT * FROM Bookings WHERE passenger_id = p_id; 
+booking Bookings%ROWTYPE; 
+BEGIN
+FOR passenger IN passengers_cursor 
+LOOP DBMS_OUTPUT.PUT_LINE('Passenger ' || passenger.passenger_id || ': ' || passenger.first_name || ' ' || passenger.last_name); 
+OPEN bookings_cursor(passenger.passenger_id); 
+LOOP 
+FETCH bookings_cursor INTO booking; 
+EXIT WHEN bookings_cursor%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(' Booking ' || booking.booking_id || ': Train ' || booking.train_id || ', Route ' || booking.route_id || ', Date ' || booking.travel_date); 
+END LOOP;
+CLOSE bookings_cursor;
+END LOOP;
+END; 
+
+
+#2. Fetch bookings by Passenger Id
+CREATE OR REPLACE PROCEDURE get_bookings_by_passenger_id (p_passenger_id IN INT) IS 
+CURSOR c_bookings IS SELECT * FROM bookings WHERE passenger_id = p_passenger_id; 
+v_booking_id bookings.booking_id%TYPE; 
+v_passenger_id bookings.passenger_id%TYPE; 
+v_train_id bookings.train_id%TYPE; 
+v_route_id bookings.route_id%TYPE; 
+v_booking_date bookings.booking_date%TYPE; 
+v_travel_date bookings.travel_date%TYPE; 
+v_class_type bookings.class_type%TYPE; 
+v_seat_number bookings.seat_number%TYPE; 
+BEGIN 
+OPEN c_bookings; 
+LOOP FETCH c_bookings INTO v_booking_id, v_passenger_id, v_train_id, v_route_id, v_booking_date, v_travel_date, v_class_type, v_seat_number; 
+EXIT WHEN c_bookings%NOTFOUND; 
+DBMS_OUTPUT.PUT_LINE('Booking ID: ' || v_booking_id || ', Passenger ID: ' || v_passenger_id || ', Train ID: ' || v_train_id || ', Route ID: ' || v_route_id || ', Booking Date: ' || v_booking_date || ', Travel Date: ' || v_travel_date || ', Class Type: ' || v_class_type || ', Seat Number: ' || v_seat_number); 
+END LOOP; 
+CLOSE c_bookings; 
+END; 

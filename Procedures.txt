@@ -1,0 +1,28 @@
+#1. procedure for deleting a route
+ CREATE OR REPLACE PROCEDURE delete_route(route_id IN INT) AS
+ BEGIN DELETE FROM Routes WHERE route_id = route_id;
+ COMMIT; DBMS_OUTPUT.PUT_LINE('Route deleted successfully!'); 
+ EXCEPTION WHEN OTHERS THEN ROLLBACK;
+ DBMS_OUTPUT.PUT_LINE('Error deleting route: ' || SQLERRM); 
+ END; 
+ 
+ 
+ 
+ #2. procedure for adding station
+ CREATE OR REPLACE PROCEDURE add_station(station_id IN INT, station_name IN VARCHAR2, location IN VARCHAR2, contact_number IN VARCHAR2) AS 
+ BEGIN INSERT INTO Stations (station_id, station_name, location, contact_number) VALUES (station_id, station_name, location, contact_number); 
+ COMMIT; DBMS_OUTPUT.PUT_LINE('Station added successfully!'); 
+ EXCEPTION WHEN OTHERS THEN ROLLBACK; 
+ DBMS_OUTPUT.PUT_LINE('Error adding station: ' || SQLERRM); 
+ END; 
+ 
+ 
+ 
+ #3. Procedure to update the job profile
+ CREATE OR REPLACE PROCEDURE update_job_title(staff_id IN NUMBER, new_job_title IN VARCHAR2) IS 
+ BEGIN UPDATE Staff SET job_title = new_job_title WHERE staff_id = staff_id; 
+ COMMIT; 
+ DBMS_OUTPUT.PUT_LINE('Job title updated successfully'); 
+ EXCEPTION WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE('No staff member with ID ' || staff_id || ' found'); 
+ WHEN OTHERS THEN DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLCODE || ' - ' || SQLERRM); 
+ END; 
